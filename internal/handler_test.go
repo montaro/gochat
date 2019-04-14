@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"fmt"
 	"testing"
 	"time"
 )
@@ -9,28 +8,22 @@ import (
 func TestHandleMessage(t *testing.T) {
 	var now = time.Now()
 	var formattedNow = now.Format(time.RFC3339)
-	//var formattedNow = now.UTC().String()
-	//fmt.Println("Now", now)
-	chatMsg := `{"msg": "Hello World!","timestamp":"` + formattedNow + `"}`
-	fmt.Printf("msg: %v", chatMsg)
-
+	chatMsg := `{"cmd": "smsg","timestamp":"` + formattedNow + `","data":{
+	"msg": "Hello World"}}`
 	unmarshalChatMessage := Message{
-		Msg:  "Hello World!",
+		Cmd:  "smsg",
 		Time: now,
+		Data: map[string]string{"msg": "Hello World"},
 	}
-
 	var msg *Message
 	msg = HandleMessage([]byte(chatMsg))
-	println()
-	fmt.Printf("msg: %v", *msg)
-	println()
-	fmt.Printf("msg: %v", unmarshalChatMessage)
-	println()
-
-	if msg.Msg != unmarshalChatMessage.Msg {
-		t.Errorf("Expected message: %v doesn't equal: %v", msg.Msg, unmarshalChatMessage.Msg)
+	if msg.Cmd != unmarshalChatMessage.Cmd {
+		t.Errorf("Expected cmd: %v doesn't equal: %v", msg.Cmd, unmarshalChatMessage.Cmd)
 	}
 	if msg.Time.Equal(unmarshalChatMessage.Time) {
-		t.Errorf("Expected message: %v doesn't equal: %v", msg.Time, unmarshalChatMessage.Time)
+		t.Errorf("Expected time: %v doesn't equal: %v", msg.Time, unmarshalChatMessage.Time)
+	}
+	if msg.Data["msg"] != unmarshalChatMessage.Data["msg"] {
+		t.Errorf("Expected message: %v doesn't equal: %v", msg.Data["msg"], unmarshalChatMessage.Data["msg"])
 	}
 }
